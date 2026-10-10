@@ -4,8 +4,8 @@ import GarageScene from './GarageScene.jsx';
 const chapters = [
   {
     short: 'INTRO',
-    number: '00',
-    eyebrow: 'GARAGEGUARD AI',
+    number: '01',
+    eyebrow: '01. INTRO TO GARAGEGUARD',
     title: <>SAFER <em>GARAGES.</em></>,
     summary: 'AI-assisted hazard detection and more efficient cleaning for the people who keep our garages safe.',
     label: 'ENTER THE EXPERIENCE',
@@ -17,8 +17,8 @@ const chapters = [
   },
   {
     short: 'ABOUT US',
-    number: '01',
-    eyebrow: '01. ABOUT US',
+    number: '02',
+    eyebrow: '02. ABOUT US',
     title: <>ABOUT <em>US.</em></>,
     fullHeading: 'A Cleaner Garage Starts With a Safer Worker.',
     summary: 'Cleaning crews keep garages safe, but often work with limited information and overlooked hazards...',
@@ -37,8 +37,8 @@ const chapters = [
   },
   {
     short: 'REALITY',
-    number: '02',
-    eyebrow: '02. THE REALITY OF CLEANING',
+    number: '03',
+    eyebrow: '03. THE REALITY OF CLEANING',
     title: <>HIDDEN <em>HAZARDS.</em></>,
     fullHeading: "The Problems You Don’t See Are the Ones That Matter.",
     summary: 'Spills, debris, wasted time, and missed reports can make everyday cleaning harder...',
@@ -64,8 +64,8 @@ const chapters = [
   },
   {
     short: 'GARAGEGUARD',
-    number: '03',
-    eyebrow: '03. MEET GARAGEGUARD',
+    number: '04',
+    eyebrow: '04. MEET GARAGEGUARD',
     title: <>MEET <em>GARAGEGUARD.</em></>,
     fullHeading: 'From Overlooked Problems to Actionable Solutions.',
     summary: 'AI-assisted detection turns overlooked maintenance problems into clear next steps...',
@@ -92,8 +92,8 @@ const chapters = [
   },
   {
     short: 'WORKERS',
-    number: '04',
-    eyebrow: '04. THE WORKER EXPERIENCE',
+    number: '05',
+    eyebrow: '05. THE WORKER EXPERIENCE',
     title: <>SMARTER <em>CLEANING.</em></>,
     fullHeading: 'Less Searching. Less Guesswork. Smarter Cleaning.',
     summary: 'Spend less time searching and more time addressing what matters...',
