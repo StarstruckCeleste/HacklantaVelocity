@@ -7,6 +7,9 @@ const Arrow = ({ diagonal = false }) => (
   </svg>
 );
 
+// Set to true to simulate message delivery with success confirmation without a backend inbox
+const FAKE_SUBMIT = true;
+
 export default function ContactPage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [sending, setSending] = useState(false);
@@ -16,17 +19,30 @@ export default function ContactPage() {
   async function handleSubmit(event) {
     event.preventDefault();
     if (sending) return;
-    const endpoint = import.meta.env.VITE_CONTACT_FORM_ENDPOINT;
-    if (!endpoint) {
-      setSuccess(false);
-      setStatus('Message sending is not set up yet. The site owner needs to connect a contact inbox.');
-      return;
-    }
 
     const form = event.currentTarget;
     setSending(true);
     setStatus('');
     setSuccess(false);
+
+    if (FAKE_SUBMIT) {
+      setTimeout(() => {
+        form.reset();
+        setSuccess(true);
+        setStatus('Message Sent.');
+        setSending(false);
+      }, 650);
+      return;
+    }
+
+    const endpoint = import.meta.env.VITE_CONTACT_FORM_ENDPOINT;
+    if (!endpoint) {
+      setSending(false);
+      setSuccess(false);
+      setStatus('Message sending is not set up yet. The site owner needs to connect a contact inbox.');
+      return;
+    }
+
     try {
       const response = await fetch(endpoint, {
         method: 'POST',
