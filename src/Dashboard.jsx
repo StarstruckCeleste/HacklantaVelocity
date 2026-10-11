@@ -349,7 +349,21 @@ export default function Dashboard() {
   };
   const openTasks = tasks.filter(t => t.status !== 'Completed').length;
   const highPriority = detections.filter(d => d.priority === 'High' && d.status !== 'Completed').length;
-  const completed = 7 + tasks.filter(t => t.status === 'Completed').length;
+  const completed = tasks.filter(t => t.status === 'Completed').length;
+
+  const resetScrollToTop = () => {
+    try {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    } catch {
+      window.scrollTo(0, 0);
+    }
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  };
+
+  useEffect(() => {
+    resetScrollToTop();
+  }, [page]);
 
   useEffect(() => { const timer = setInterval(() => setNow(new Date()),60000); return () => clearInterval(timer); },[]);
   useEffect(() => { if (!notice) return; const timer = setTimeout(() => setNotice(''),4200); return () => clearTimeout(timer); },[notice]);
@@ -391,7 +405,7 @@ export default function Dashboard() {
 
   return <div className="gc-app">
     <header className="gc-header"><a className="gc-logo gc-logo-image-wrap" href="#/" title="Return to the 3D experience"><img className="gc-logo-image" src="/garageguard-header-logo.png" alt="GarageGuard logo" /></a><div className="gc-header-right"><span className="gc-online"><i/> System Online <em>DEMO</em></span><span className="gc-date">{now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'})}<small>{now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}</small></span><a className="gc-back" href="#/">← 3D Experience</a></div></header>
-    <aside className="gc-sidebar"><div className="gc-sidebar-nav">{navItems.map(n => <button key={n.name} className={`gc-side-link ${page===n.name ? 'is-active' : ''}`} onClick={()=>setPage(n.name)} aria-current={page === n.name ? 'page' : undefined}><Icon name={n.icon} size={23}/><span>{n.name}</span>{n.name==='Tasks' && openTasks>0 && <span className="gc-side-count">{openTasks}</span>}</button>)}</div><div className="gc-sidebar-foot"><div className="gc-side-pulse"><i/> Demo environment</div><span>GARAGEGUARD / SYSTEM v1.1</span></div></aside>
+    <aside className="gc-sidebar"><div className="gc-sidebar-nav">{navItems.map(n => <button key={n.name} className={`gc-side-link ${page===n.name ? 'is-active' : ''}`} onClick={()=>{setPage(n.name);resetScrollToTop();}} aria-current={page === n.name ? 'page' : undefined}><Icon name={n.icon} size={23}/><span>{n.name}</span>{n.name==='Tasks' && openTasks>0 && <span className="gc-side-count">{openTasks}</span>}</button>)}</div><div className="gc-sidebar-foot"><div className="gc-side-pulse"><i/> Demo environment</div><span>GARAGEGUARD / SYSTEM v1.1</span></div></aside>
     <main className="gc-main">
       {page==='Dashboard' && <><div className="gc-ai-dashboard-cta"><div><Icon name="scan" size={22}/><span><strong>Try real AI detection</strong><small>Upload a garage image and see your Roboflow model find litter.</small></span></div><button onClick={() => setPage('AI Detection')}>Open AI Detector <Icon name="arrow" size={15}/></button></div><div className="gc-dashboard-grid"><div className="gc-main-column"><div className="gc-stats"><Metric icon="trash" count={detections.length} label="Items Detected" note="Sample detection log" color="red"/><Metric icon="check" count={completed} label="Tasks Completed" note="Sample task history" color="navy"/><Metric icon="warning" count={highPriority} label="High Priority" note="Needs attention" color="red"/><Metric icon="repeat" count={repeatedGroups.length} label="Repeat Hotspots" note={`${repeatedCount} repeat sightings`} color="amber"/></div>{mapPanel}{repeatPanel}{detectionPanel}</div><div className="gc-right-column"><section className="gc-panel gc-camera-panel"><SectionTitle name="Live Camera Feed" icon="video" action={<span className="gc-live-tag"><i/> LIVE DEMO</span>}/><p className="gc-camera-sub">Floor {cameraDetection.floor} - Zone {cameraDetection.zone} - Camera {cameraId}</p>{feed}</section>{details}{taskList}</div></div></>}
       {page==='AI Detection' && <RoboflowUpload/>}

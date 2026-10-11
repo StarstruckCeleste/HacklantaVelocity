@@ -215,7 +215,7 @@ export default function RoboflowUpload() {
           {result && !visible.length && <div className="gc-ai-no-results"><Icon name="check" size={30}/><b>No objects detected</b><p>Try another photo. Results depend on the classes your model recognizes.</p></div>}
           {!result && <div className="gc-ai-waiting"><Icon name={busy ? 'refresh' : 'image'} size={26}/><p>{busy ? 'Roboflow is processing the image…' : photo ? 'Click Detect Litter to see predictions.' : 'Upload a photo to see real model predictions.'}</p></div>}
         </div>
-        <div className="gc-ai-insights-foot"><Icon name="cloud" size={16}/><span>Results come from your configured Roboflow workflow, not the sample dashboard data. Detected classes depend on how your model was trained.</span></div>
+        {/*<div className="gc-ai-insights-foot"><Icon name="cloud" size={16}/><span>Results come from your configured Roboflow workflow, not the sample dashboard data. Detected classes depend on how your model was trained.</span></div>*/}
       </section>
     </div>
   </div>;
