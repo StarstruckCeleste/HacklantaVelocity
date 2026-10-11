@@ -6,6 +6,9 @@ import ContactPage from './ContactPage.jsx';
 import TransitionSlide from './TransitionSlide.jsx';
 import './style.css';
 
+const isDashboardRoute = (hash = '') =>
+  hash.startsWith('#/dashboard') || hash.startsWith('#/live-demo');
+
 function Router() {
   const [route, setRoute] = useState(window.location.hash);
   const [transition, setTransition] = useState({
@@ -23,8 +26,8 @@ function Router() {
   useEffect(() => {
     const handleRoute = () => {
       const newHash = window.location.hash;
-      const wasDemo = currentRouteRef.current.startsWith('#/demo');
-      const isDemo = newHash.startsWith('#/demo');
+      const wasDemo = isDashboardRoute(currentRouteRef.current);
+      const isDemo = isDashboardRoute(newHash);
 
       if (wasDemo !== isDemo) {
         if (isTransitioningRef.current) return;
@@ -58,7 +61,7 @@ function Router() {
 
   return (
     <>
-      {route.startsWith('#/demo')
+      {isDashboardRoute(route)
         ? <Dashboard />
         : route.startsWith('#/contact')
           ? <ContactPage />

@@ -44,7 +44,7 @@ button:disabled { cursor: not-allowed; }
 .live-dot, .pulse-indicator, .pink-dot { display: inline-block; flex-shrink: 0; width: 6px; height: 6px; background: #757D6F; border-radius: 50%; box-shadow: 0 0 11px #757D6F; vertical-align: 2px; }
 .header-center .live-dot { margin-right: 9px; }
 .header-separator { color: #2D0000; padding: 0 9px; }
-.header-demo-button { background: transparent; border: 0; padding: 0; margin: 0; color: inherit; font: inherit; letter-spacing: inherit; cursor: pointer; pointer-events: auto; transition: color .25s ease; }
+.header-demo-button { background: transparent; border: 0; padding: 0; margin: 0; color: inherit; font: inherit; letter-spacing: inherit; text-decoration: none; cursor: pointer; pointer-events: auto; transition: color .25s ease; }
 .header-demo-button:hover { color: #EEEAD7; text-decoration: underline; text-underline-offset: 3px; }
 .header-nav { height: 49px; border: 1px solid rgba(117,125,111,.44); background: rgba(45,0,0,.58); backdrop-filter: blur(20px); border-radius: 999px; display: flex; align-items: center; gap: 17px; padding: 0 22px; box-shadow: inset 0 0 17px rgba(117,125,111,.12), 0 0 24px rgba(109,8,8,.18); flex-shrink: 0; }
 .header-nav button, .header-nav a { border: 0; background: transparent; padding: 0; margin: 0; line-height: 1; box-sizing: border-box; color: inherit; text-decoration: none; font: 11px var(--mono); display: flex; align-items: center; gap: 9px; white-space: nowrap; cursor: pointer; transition: color .3s; flex-shrink: 0; }

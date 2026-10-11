@@ -72,8 +72,8 @@ export default function ContactPage() {
           <a
             href="#/demo"
             className="header-demo-button"
-            title="Launch Live Demo"
-            aria-label="Launch Live Demo"
+            title="Jump to slide 6"
+            aria-label="Jump to slide 6"
           >
             DEMO BUILD
           </a>
@@ -89,7 +89,7 @@ export default function ContactPage() {
           </a>
           <span className="nav-divider" aria-hidden="true" />
           <a
-            href="#/demo"
+            href="#/dashboard"
             onClick={() => setMenuOpen(false)}
             aria-label="Launch Live Demo website"
           >

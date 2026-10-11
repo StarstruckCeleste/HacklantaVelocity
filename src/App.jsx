@@ -196,8 +196,10 @@ export default function App() {
   const indexRef = useRef(0);
 
   const goTo = useCallback((index) => {
-    const bounded = Math.max(0, Math.min(chapters.length - 1, index));
-    document.getElementById(`chapter-${bounded}`)?.scrollIntoView({
+    const normalized = index >= chapters.length ? index - 1 : index;
+    const bounded = Math.max(0, Math.min(chapters.length - 1, normalized));
+    const target = document.getElementById(`chapter-${bounded + 1}`) || document.getElementById(`chapter-${bounded}`);
+    target?.scrollIntoView({
       behavior: reducedMotionRef.current ? 'auto' : 'smooth', block: 'start',
     });
     setMenuOpen(false);
@@ -250,9 +252,17 @@ export default function App() {
   }, [goTo, incidentOpen]);
 
   useEffect(() => {
-    if (window.location.hash === '#/about') {
-      goTo(1);
-    }
+    const handleHash = () => {
+      const hash = window.location.hash;
+      if (hash === '#/about' || hash === '#about' || hash === '#chapter-2') {
+        setTimeout(() => goTo(1), 50);
+      } else if (hash === '#/demo' || hash === '#demo' || hash === '#chapter-6' || hash === '#chapter-5' || hash === '#/slide-6') {
+        setTimeout(() => goTo(5), 50);
+      }
+    };
+    handleHash();
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
   }, [goTo]);
 
   return (
@@ -269,15 +279,18 @@ export default function App() {
         </a>
         <div className="header-center">
           WORKER-FIRST FACILITY AI <span className="header-separator">/</span>{' '}
-          <button
-            type="button"
+          <a
+            href="#/demo"
             className="header-demo-button"
-            onClick={() => goTo(5)}
+            onClick={(e) => {
+              e.preventDefault();
+              goTo(5);
+            }}
             title="Jump to slide 6"
             aria-label="Jump to slide 6"
           >
             DEMO BUILD
-          </button>
+          </a>
         </div>
         <nav className={`header-nav ${menuOpen ? 'menu-open' : ''}`} aria-label="Main navigation">
           <a href="#/about" onClick={(e) => { e.preventDefault(); goTo(1); }}>ABOUT</a>
@@ -290,7 +303,7 @@ export default function App() {
           </a>
           <span className="nav-divider" aria-hidden="true" />
           <a
-            href="#/demo"
+            href="#/dashboard"
             onClick={() => setMenuOpen(false)}
             aria-label="Launch Live Demo website"
           >
@@ -331,7 +344,7 @@ export default function App() {
         {chapters.map((chapter, index) => {
           const isExpanded = !!expandedChapters[chapter.number];
           return (
-            <section className={`chapter chapter-${index} ${index === current ? 'is-active' : ''} align-${chapter.align} ${chapter.kind ?? ''}`} id={`chapter-${index}`} key={chapter.number} aria-label={`Chapter ${index + 1}: ${chapter.short}`}>
+            <section className={`chapter chapter-${index + 1} ${index === current ? 'is-active' : ''} align-${chapter.align} ${chapter.kind ?? ''}`} id={`chapter-${index + 1}`} key={chapter.number} aria-label={`Chapter ${index + 1}: ${chapter.short}`}>
               <div className="chapter-content">
                 <div className="story-eyebrow"><span className="eyebrow-dash" /> {chapter.eyebrow}</div>
                 <h1 className="story-title">{chapter.title}</h1>
@@ -347,7 +360,7 @@ export default function App() {
                   </button>
                 )}
                 {chapter.kind === 'demo' && (
-                  <a className="outline-action demo-action" href="#/demo">
+                  <a className="outline-action demo-action" href="#/dashboard">
                     LAUNCH THE LIVE DASHBOARD <Arrow diagonal />
                   </a>
                 )}
