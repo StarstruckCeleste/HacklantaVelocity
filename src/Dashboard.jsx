@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import './dashboard.css';
 import RoboflowUpload from './RoboflowUpload.jsx';
 
@@ -98,6 +98,121 @@ function SectionTitle({ name, icon, action, children }) {
   return <div className="gc-section-heading"><div className="gc-section-name"><span className={`gc-section-icon tone-${icon}`}><Icon name={icon} size={23} /></span><h2>{name}</h2></div>{action && <div>{action}</div>}{children}</div>;
 }
 
+function TaskStatusDropdown({ value, onChange, options, title, isOpen, onToggle }) {
+  const [placement, setPlacement] = useState('bottom');
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const checkPosition = () => {
+      if (!ref.current) return;
+      const rect = ref.current.getBoundingClientRect();
+      const menuHeight = 170;
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const spaceAbove = rect.top;
+
+      if (spaceBelow < menuHeight + 20 && spaceAbove > spaceBelow) {
+        setPlacement('top');
+      } else {
+        setPlacement('bottom');
+      }
+    };
+
+    checkPosition();
+    window.addEventListener('scroll', checkPosition, true);
+    window.addEventListener('resize', checkPosition);
+
+    const handleDown = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) {
+        onToggle(false);
+      }
+    };
+    const handleKey = (e) => {
+      if (e.key === 'Escape') onToggle(false);
+    };
+
+    window.addEventListener('pointerdown', handleDown);
+    window.addEventListener('keydown', handleKey);
+    return () => {
+      window.removeEventListener('scroll', checkPosition, true);
+      window.removeEventListener('resize', checkPosition);
+      window.removeEventListener('pointerdown', handleDown);
+      window.removeEventListener('keydown', handleKey);
+    };
+  }, [isOpen, onToggle]);
+
+  return (
+    <div className={`gc-status-dropdown-wrap ${isOpen ? 'is-open' : ''}`} ref={ref}>
+      <button
+        type="button"
+        className={`gc-status-dropdown-trigger ${isOpen ? 'is-open' : ''}`}
+        onClick={() => onToggle(!isOpen)}
+        aria-label={`Update ${title} status, current: ${value}`}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+      >
+        <span>{value}</span>
+        <svg
+          className={`gc-dropdown-chevron ${isOpen ? 'rotated' : ''}`}
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+      {isOpen && (
+        <div
+          className={`gc-status-dropdown-menu placement-${placement}`}
+          role="listbox"
+          aria-label="Task status options"
+        >
+          {options.map((opt) => {
+            const isSelected = opt === value;
+            return (
+              <button
+                key={opt}
+                type="button"
+                role="option"
+                aria-selected={isSelected}
+                className={`gc-status-dropdown-item ${isSelected ? 'selected' : ''}`}
+                onClick={() => {
+                  onChange(opt);
+                  onToggle(false);
+                }}
+              >
+                <span>{opt}</span>
+                {isSelected && (
+                  <svg
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function FloorPlan({ floor, detections, selectedId, onSelect, all = false }) {
   const visible = detections.filter(d => d.floor === floor);
   const clustered = [...visible.reduce((map,d) => {
@@ -182,6 +297,7 @@ export default function Dashboard() {
   const [priorityFilter, setPriorityFilter] = useState('All');
   const [taskFilter, setTaskFilter] = useState('All');
   const [repeatFilter, setRepeatFilter] = useState('All');
+  const [openTaskId, setOpenTaskId] = useState(null);
   const [showAll, setShowAll] = useState(false);
   const [notice, setNotice] = useState('');
   const [settings, setSettings] = useState({ alerts: true, autoTasks: false, sound: false });
@@ -280,14 +396,14 @@ export default function Dashboard() {
       {page==='Dashboard' && <><div className="gc-ai-dashboard-cta"><div><Icon name="scan" size={22}/><span><strong>Try real AI detection</strong><small>Upload a garage image and see your Roboflow model find litter.</small></span></div><button onClick={() => setPage('AI Detection')}>Open AI Detector <Icon name="arrow" size={15}/></button></div><div className="gc-dashboard-grid"><div className="gc-main-column"><div className="gc-stats"><Metric icon="trash" count={detections.length} label="Items Detected" note="Sample detection log" color="red"/><Metric icon="check" count={completed} label="Tasks Completed" note="Sample task history" color="navy"/><Metric icon="warning" count={highPriority} label="High Priority" note="Needs attention" color="red"/><Metric icon="repeat" count={repeatedGroups.length} label="Repeat Hotspots" note={`${repeatedCount} repeat sightings`} color="amber"/></div>{mapPanel}{repeatPanel}{detectionPanel}</div><div className="gc-right-column"><section className="gc-panel gc-camera-panel"><SectionTitle name="Live Camera Feed" icon="video" action={<span className="gc-live-tag"><i/> LIVE DEMO</span>}/><p className="gc-camera-sub">Floor {cameraDetection.floor} - Zone {cameraDetection.zone} - Camera {cameraId}</p>{feed}</section>{details}{taskList}</div></div></>}
       {page==='AI Detection' && <RoboflowUpload/>}
       {page==='Repeated Incidents' && <>
-        <div className="gc-page-intro gc-repeat-intro"><div><span className="gc-overline">RECURRENCE MONITOR / SIMULATED DATA</span><h1>Repeated Incidents</h1><p>Spot places that repeatedly collect the same waste. Matching means same floor, zone, and item type—not necessarily the same physical object.</p></div><button className="gc-primary" onClick={()=>simulateRepeat(repeatedGroups[0]?.latest || selected)}><Icon name="plus" size={17}/> Simulate Repeat</button></div>
+        <div className="gc-page-intro gc-repeat-intro"><div><span className="gc-overline">RECURRENCE MONITOR</span><h1>Repeated Incidents</h1><p>Spot places that repeatedly collect the same waste. Matching means same floor, zone, and item type—not necessarily the same physical object.</p></div><button className="gc-primary" onClick={()=>simulateRepeat(repeatedGroups[0]?.latest || selected)}><Icon name="plus" size={17}/> Simulate Repeat</button></div>
         <div className="gc-repeat-summary"><article><span>RECURRING HOTSPOTS</span><b>{repeatedGroups.length}</b><small>Locations with repeat sightings</small></article><article><span>REPEATED SIGHTINGS</span><b>{repeatedCount}</b><small>Beyond the first detection</small></article><article><span>OPEN INCIDENTS IN HOTSPOTS</span><b>{repeatedGroups.reduce((n,g)=>n+g.active,0)}</b><small>Pending, assigned or in progress</small></article><article><span>MOST FREQUENT ZONE</span><b>{repeatedGroups[0] ? `F${repeatedGroups[0].floor} · ${repeatedGroups[0].zone}` : '—'}</b><small>{repeatedGroups[0]?.count || 0} matching sightings</small></article></div>
         <section className="gc-panel gc-repeat-workspace"><div className="gc-workspace-tools"><div className="gc-section-name"><span className="gc-section-icon tone-repeat"><Icon name="repeat" size={23}/></span><h2>Recurring Hotspot History</h2></div><div className="gc-filter-tabs">{['All','1','2','3','4'].map(f=><button key={f} className={repeatFilter===f?'active':''} onClick={()=>setRepeatFilter(f)}>{f==='All'?'All Floors':`Floor ${f}`}</button>)}</div></div><div className="gc-repeat-history-grid">{repeatedGroups.filter(g=>repeatFilter==='All'||g.floor===Number(repeatFilter)).map(g=><article key={g.key} className="gc-repeat-history-card"><div className="gc-repeat-card-top"><span className="gc-repeat-location">FLOOR {g.floor} <span>·</span> ZONE {g.zone}</span><span className="gc-repeat-count">{g.count} SIGHTINGS</span></div><div className="gc-repeat-card-main"><Photo name={g.latest.image}/><div><h3>{g.type}</h3><p>{g.active > 0 ? `${g.active} open detection${g.active!==1?'s':''}` : 'All logged sightings resolved'}</p><small>Camera {g.latest.camera} · Last seen {g.latest.time}</small></div></div><div className="gc-repeat-timeline"><span className="gc-repeat-timeline-title">SIGHTING HISTORY</span>{g.items.map((d,i)=><button key={d.id} className={`gc-repeat-timeline-row ${selectedId===d.id?'is-selected':''}`} onClick={()=>chooseDetection(d.id,true)} title="Open this detection on Dashboard"><span className={`gc-repeat-timeline-dot ${d.status==='Completed'?'closed':'open'}`}/><span>{i===0?'Latest sighting':`Previous sighting ${i}`}</span><b>{d.time}</b><Label status={d.status}/><Icon name="arrow" size={15}/></button>)}</div><div className="gc-repeat-card-footer"><button className="gc-secondary" onClick={()=>{chooseDetection(g.latest.id);setPage('Floor Map');}}>View Map</button><button className="gc-primary" onClick={()=>simulateRepeat(g.latest)}><Icon name="plus" size={15}/> Add Repeat</button></div></article>)}{repeatedGroups.filter(g=>repeatFilter==='All'||g.floor===Number(repeatFilter)).length===0 && <div className="gc-empty">No repeated incidents on this floor yet. Simulate a repeat to create one.</div>}</div></section>
       </>}
-      {page==='Live Cameras' && <><div className="gc-page-intro"><div><span className="gc-overline">CAMERA NETWORK / SIMULATED</span><h1>Live Cameras</h1><p>Select a camera to review detections and create cleaning tasks. All feeds are illustrative still images.</p></div></div><div className="gc-camera-view-grid"><section className="gc-panel gc-large-camera"><SectionTitle name={`Camera ${cameraId} · Floor ${cameraDetection.floor} · Zone ${cameraDetection.zone}`} icon="video" action={<span className="gc-live-tag">DEMO STILL</span>}/>{feed}<div className="gc-camera-footnote"><span>Detection overlay · {cameraDetection.confidence}% model confidence</span><button className="gc-primary" onClick={() => createTask(cameraDetection.id)}>Create / View Task</button></div></section><section className="gc-panel gc-camera-selector"><SectionTitle name="Available Cameras" icon="layers"/><div className="gc-camera-options">{cameras.map(id=> {const match = detections.find(d=>d.camera===id);return <button key={id} className={id===cameraId?'selected':''} onClick={()=>{setCameraId(id);if(match)chooseDetection(match.id);}}><Photo name={match?.image || 'bag'}/><span><b>Camera {id}</b><small>Floor {match?.floor || 3} · Zone {match?.zone || 'B'}</small></span><Icon name="eye" size={17}/></button>;})}</div></section></div></>}
-      {page==='Floor Map' && <><div className="gc-page-intro"><div><span className="gc-overline">SPATIAL OVERVIEW / FOUR FLOORS</span><h1>Floor Map</h1><p>Select a floor, then select any color-coded marker to inspect its detection.</p></div><FloorPicker floor={floor} setFloor={setFloor}/></div><div className="gc-floor-grid"><section className="gc-panel gc-full-map"><SectionTitle name={`Level ${floor} · Zone Overview`} icon="map"/><FloorPlan floor={floor} detections={detections} selectedId={selectedId} onSelect={chooseDetection} all/><MapLegend/></section><section className="gc-panel gc-floor-items"><SectionTitle name="Detections on This Floor" icon="warning"/><div className="gc-floor-item-list">{detections.filter(d=>d.floor===floor).map(d=><button key={d.id} className={selectedId===d.id?'selected':''} onClick={()=>chooseDetection(d.id)}><Photo name={d.image}/><span><b>{d.type}</b><small>Zone {d.zone} · Camera {d.camera}</small></span><Label priority={d.priority}/></button>)}</div><button className="gc-primary gc-wide" onClick={()=>setPage('Dashboard')}>View Selected Detection</button></section></div></>}
-      {page==='Tasks' && <><div className="gc-page-intro"><div><span className="gc-overline">CREW WORKFLOW / TASK QUEUE</span><h1>Cleaning Tasks</h1><p>Assign, start, and complete cleaning jobs. Changes update the dashboard and detections.</p></div><div className="gc-summary-pills"><span>{openTasks} open</span><span>{completed} completed</span></div></div><div className="gc-panel gc-task-workspace"><div className="gc-workspace-tools"><div className="gc-section-name"><span className="gc-section-icon tone-clipboard"><Icon name="clipboard"/></span><h2>Task Queue</h2></div><div className="gc-filter-tabs">{['All',...statusOptions].map(s=><button key={s} onClick={()=>setTaskFilter(s)} className={taskFilter===s?'active':''}>{s}</button>)}</div></div><div className="gc-task-rows">{tasks.filter(t=>taskFilter==='All'||t.status===taskFilter).map(t=>{const d=detections.find(d=>d.id===t.detectionId);return <article className="gc-task-row" key={t.id}><Photo name={d?.image||'bag'}/><div className="gc-task-row-name"><small>{t.id} · {t.created}</small><b>{t.title}</b><span>Floor {d?.floor}, Zone {d?.zone} · Camera {d?.camera}</span></div><Label priority={d?.priority||'Low'}/><Label status={t.status}/><div className="gc-task-row-actions"><select aria-label={`Update ${t.title} status`} value={t.status} onChange={e=>updateTask(t.id,e.target.value)}>{statusOptions.map(x=><option key={x}>{x}</option>)}</select><button onClick={()=>{chooseDetection(t.detectionId,true);}} title="Open detection"><Icon name="arrow" size={18}/></button></div></article>;})}{tasks.filter(t=>taskFilter==='All'||t.status===taskFilter).length===0 && <div className="gc-empty">No tasks in this status.</div>}</div></div></>}
-      {page==='Analytics' && <><div className="gc-page-intro"><div><span className="gc-overline">OPERATIONAL INSIGHTS / DEMO DATA</span><h1>Analytics</h1><p>Explore detection volume, recurring hotspots and risk distribution across floors.</p></div><button className="gc-secondary gc-export" onClick={()=>exportCSV(detections)}><Icon name="download" size={17}/> Export CSV</button></div><div className="gc-stats gc-analytics-stats"><Metric icon="trash" count={detections.length} label="Total Detections" note="Last sample period" color="red"/><Metric icon="check" count={completed} label="Tasks Completed" note="Across all floors" color="navy"/><Metric icon="warning" count={highPriority} label="High Priority" note="Needs attention" color="red"/><Metric icon="repeat" count={repeatedGroups.length} label="Repeat Hotspots" note={`${repeatedCount} extra sightings`} color="amber"/></div><div className="gc-analytics-grid"><section className="gc-panel gc-chart-panel"><SectionTitle name="Detections by Floor" icon="bars"/><div className="gc-bar-chart">{[1,2,3,4].map(f=>{const n=detections.filter(d=>d.floor===f).length;return <button key={f} title={`View floor ${f}`} onClick={()=>{setFloor(f);setPage('Floor Map');}}><span className="gc-chart-value">{n}</span><span className="gc-chart-track"><span style={{height:`${Math.max(7,n / Math.max(...[1,2,3,4].map(f=>detections.filter(d=>d.floor===f).length)) * 100)}%`}}/></span><b>Floor {f}</b></button>;})}</div></section><section className="gc-panel gc-chart-panel"><SectionTitle name="Priority Distribution" icon="warning"/><div className="gc-priority-breakdown">{['High','Medium','Low'].map(p=>{const n=detections.filter(d=>d.priority===p).length;return <div key={p}><div><b>{p} Priority</b><strong>{n} detections</strong></div><span className="gc-break-track"><span className={`bar-${p.toLowerCase()}`} style={{width:`${n/detections.length*100}%`}}/></span></div>;})}</div></section></div></>}
+      {page==='Live Cameras' && <><div className="gc-page-intro"><div><span className="gc-overline">CAMERA NETWORK</span><h1>Live Cameras</h1><p>Select a camera to review detections and create cleaning tasks. All feeds are illustrative still images.</p></div></div><div className="gc-camera-view-grid"><section className="gc-panel gc-large-camera"><SectionTitle name={`Camera ${cameraId} · Floor ${cameraDetection.floor} · Zone ${cameraDetection.zone}`} icon="video" action={<span className="gc-live-tag">DEMO STILL</span>}/>{feed}<div className="gc-camera-footnote"><span>Detection overlay · {cameraDetection.confidence}% model confidence</span><button className="gc-primary" onClick={() => createTask(cameraDetection.id)}>Create / View Task</button></div></section><section className="gc-panel gc-camera-selector"><SectionTitle name="Available Cameras" icon="layers"/><div className="gc-camera-options">{cameras.map(id=> {const match = detections.find(d=>d.camera===id);return <button key={id} className={id===cameraId?'selected':''} onClick={()=>{setCameraId(id);if(match)chooseDetection(match.id);}}><Photo name={match?.image || 'bag'}/><span><b>Camera {id}</b><small>Floor {match?.floor || 3} · Zone {match?.zone || 'B'}</small></span><Icon name="eye" size={17}/></button>;})}</div></section></div></>}
+      {page==='Floor Map' && <><div className="gc-page-intro"><div><span className="gc-overline">SPATIAL OVERVIEW</span><h1>Floor Map</h1><p>Select a floor, then select any color-coded marker to inspect its detection.</p></div><FloorPicker floor={floor} setFloor={setFloor}/></div><div className="gc-floor-grid"><section className="gc-panel gc-full-map"><SectionTitle name={`Level ${floor} · Zone Overview`} icon="map"/><FloorPlan floor={floor} detections={detections} selectedId={selectedId} onSelect={chooseDetection} all/><MapLegend/></section><section className="gc-panel gc-floor-items"><SectionTitle name="Detections on This Floor" icon="warning"/><div className="gc-floor-item-list">{detections.filter(d=>d.floor===floor).map(d=><button key={d.id} className={selectedId===d.id?'selected':''} onClick={()=>chooseDetection(d.id)}><Photo name={d.image}/><span><b>{d.type}</b><small>Zone {d.zone} · Camera {d.camera}</small></span><Label priority={d.priority}/></button>)}</div><button className="gc-primary gc-wide" onClick={()=>setPage('Dashboard')}>View Selected Detection</button></section></div></>}
+      {page==='Tasks' && <><div className="gc-page-intro"><div><span className="gc-overline">TASK QUEUE</span><h1>Cleaning Tasks</h1><p>Assign, start, and complete cleaning jobs. Changes update the dashboard and detections.</p></div><div className="gc-summary-pills"><span>{openTasks} open</span><span>{completed} completed</span></div></div><div className="gc-panel gc-task-workspace"><div className="gc-workspace-tools"><div className="gc-section-name"><span className="gc-section-icon tone-clipboard"><Icon name="clipboard"/></span><h2>Task Queue</h2></div><div className="gc-filter-tabs">{['All',...statusOptions].map(s=><button key={s} onClick={()=>setTaskFilter(s)} className={taskFilter===s?'active':''}>{s}</button>)}</div></div><div className="gc-task-rows">{tasks.filter(t=>taskFilter==='All'||t.status===taskFilter).map(t=>{const d=detections.find(d=>d.id===t.detectionId);const isDropdownOpen = openTaskId === t.id;return <article className={`gc-task-row ${isDropdownOpen ? 'is-dropdown-open' : ''}`} key={t.id}><Photo name={d?.image||'bag'}/><div className="gc-task-row-name"><small>{t.id} · {t.created}</small><b>{t.title}</b><span>Floor {d?.floor}, Zone {d?.zone} · Camera {d?.camera}</span></div><Label priority={d?.priority||'Low'}/><Label status={t.status}/><div className="gc-task-row-actions"><TaskStatusDropdown value={t.status} onChange={val => updateTask(t.id, val)} options={statusOptions} title={t.title} isOpen={isDropdownOpen} onToggle={state => setOpenTaskId(state ? t.id : null)} /><button className="gc-task-open-btn" onClick={()=>{chooseDetection(t.detectionId,true);}} title="Open detection"><Icon name="arrow" size={18}/></button></div></article>;})}{tasks.filter(t=>taskFilter==='All'||t.status===taskFilter).length===0 && <div className="gc-empty">No tasks in this status.</div>}</div></div></>}
+      {page==='Analytics' && <><div className="gc-page-intro"><div><span className="gc-overline">OPERATIONAL INSIGHTS</span><h1>Analytics</h1><p>Explore detection volume, recurring hotspots and risk distribution across floors.</p></div><button className="gc-secondary gc-export" onClick={()=>exportCSV(detections)}><Icon name="download" size={17}/> Export CSV</button></div><div className="gc-stats gc-analytics-stats"><Metric icon="trash" count={detections.length} label="Total Detections" note="Last sample period" color="red"/><Metric icon="check" count={completed} label="Tasks Completed" note="Across all floors" color="navy"/><Metric icon="warning" count={highPriority} label="High Priority" note="Needs attention" color="red"/><Metric icon="repeat" count={repeatedGroups.length} label="Repeat Hotspots" note={`${repeatedCount} extra sightings`} color="amber"/></div><div className="gc-analytics-grid"><section className="gc-panel gc-chart-panel"><SectionTitle name="Detections by Floor" icon="bars"/><div className="gc-bar-chart">{[1,2,3,4].map(f=>{const n=detections.filter(d=>d.floor===f).length;return <button key={f} title={`View floor ${f}`} onClick={()=>{setFloor(f);setPage('Floor Map');}}><span className="gc-chart-value">{n}</span><span className="gc-chart-track"><span style={{height:`${Math.max(7,n / Math.max(...[1,2,3,4].map(f=>detections.filter(d=>d.floor===f).length)) * 100)}%`}}/></span><b>Floor {f}</b></button>;})}</div></section><section className="gc-panel gc-chart-panel"><SectionTitle name="Priority Distribution" icon="warning"/><div className="gc-priority-breakdown">{['High','Medium','Low'].map(p=>{const n=detections.filter(d=>d.priority===p).length;return <div key={p}><div><b>{p} Priority</b><strong>{n} detections</strong></div><span className="gc-break-track"><span className={`bar-${p.toLowerCase()}`} style={{width:`${n/detections.length*100}%`}}/></span></div>;})}</div></section></div></>}
       {page==='Settings' && <><div className="gc-page-intro"><div><span className="gc-overline">ENVIRONMENT PREFERENCES</span><h1>Settings</h1><p>Customize the behavior of this interactive demonstration.</p></div></div><section className="gc-panel gc-settings-panel"><SectionTitle name="Detection Preferences" icon="settings"/>{[['alerts','Show incident notifications','Show a confirmation after task updates.'],['autoTasks','Auto-create tasks','Automatically create a cleaning task for newly simulated detections.'],['sound','Sound alerts','Play a brief sound for simulated events and task updates (not camera audio).']].map(([key,title,desc])=><label className="gc-setting-row" key={key}><span><b>{title}</b><small>{desc}</small></span><input type="checkbox" checked={settings[key]} onChange={e=>setSettings(prev=>({...prev,[key]:e.target.checked}))}/><span className="gc-toggle" aria-hidden="true"/></label>)}<div className="gc-settings-reset"><p>Reset restores the original sample detections, tasks and metrics.</p><button className="gc-secondary" onClick={()=>{setDetections(initialDetections);setTasks(initialTasks);setSelectedId('D-101');setCameraId('3B');setFloor(3);notify('Demo data reset to its initial state.');}}>Reset demo data <Icon name="refresh" size={17}/></button></div></section></>}
       <footer className="gc-footer">GarageGuard AI · Dashboard incidents and camera stills are simulated. The AI Detection upload page uses Roboflow Cloud when configured; no live CCTV feed is connected.</footer>
     </main>

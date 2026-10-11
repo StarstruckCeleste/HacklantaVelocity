@@ -158,9 +158,10 @@ export default function RoboflowUpload() {
   const modelHeight = result?.imageHeight || photo?.height || 1;
 
   return <div className="gc-ai-page">
-    <div className="gc-ai-heading">
-      <div><div className="gc-ai-overline"><span className="gc-ai-pulse"/> REAL CLOUD INFERENCE / ROBOFLOW WORKFLOWS</div>
-        <h1>AI Litter Detection<span className="gc-ai-period">.</span></h1>
+    <div className="gc-page-intro">
+      <div>
+        <span className="gc-overline">REAL CLOUD INFERENCE</span>
+        <h1>AI Cleanup Detection</h1>
         <p>Upload a parking garage photo. GarageGuard sends it to your Roboflow Cloud workflow and highlights the objects your model identifies.</p>
       </div>
       <div className="gc-ai-cloud-pill"><Icon name="cloud" size={17}/><span>ROBOFLOW CLOUD</span></div>
@@ -189,7 +190,7 @@ export default function RoboflowUpload() {
 
     <div className="gc-ai-results-grid">
       <section className="gc-ai-visual-panel">
-        <div className="gc-ai-panel-head"><div><span className="gc-ai-panel-eyebrow">01 / VISUAL ANALYSIS</span><h2>Detection Preview</h2></div><span className={`gc-ai-status ${busy ? 'processing' : result ? 'complete' : ''}`}><span/>{busy ? 'PROCESSING' : result ? 'ANALYSIS COMPLETE' : 'AWAITING IMAGE'}</span></div>
+        <div className="gc-ai-panel-head"><div><span className="gc-ai-panel-eyebrow">VISUAL ANALYSIS</span><h2>Detection Preview</h2></div><span className={`gc-ai-status ${busy ? 'processing' : result ? 'complete' : ''}`}><span/>{busy ? 'PROCESSING' : result ? 'ANALYSIS COMPLETE' : 'AWAITING IMAGE'}</span></div>
         <div className="gc-ai-visual-area">
           {photo ? <div className="gc-ai-image-stage" style={{aspectRatio: `${photo.width} / ${photo.height}`, width: `min(100%, ${Math.round(620 * photo.width / photo.height)}px)`}}>
             <img src={photo.dataUrl} alt="Uploaded garage photo for object detection"/>
@@ -207,7 +208,7 @@ export default function RoboflowUpload() {
       </section>
 
       <section className="gc-ai-insights-panel">
-        <div className="gc-ai-panel-head"><div><span className="gc-ai-panel-eyebrow">02 / MODEL OUTPUT</span><h2>Detection Results</h2></div><Icon name="scan" size={23}/></div>
+        <div className="gc-ai-panel-head"><div><span className="gc-ai-panel-eyebrow">MODEL OUTPUT</span><h2>Detection Results</h2></div><Icon name="scan" size={23}/></div>
         <div className="gc-ai-summary"><span>OBJECTS DETECTED</span><strong>{result ? visible.length.toString().padStart(2, '0') : '—'}</strong><small>{result ? `${counts.size} ${counts.size === 1 ? 'class' : 'classes'} identified` : 'Waiting for analysis'}</small></div>
         <div className="gc-ai-detection-list" aria-live="polite">
           {visible.map((d, index) => <button type="button" key={`${d.id}-${index}`} className={`gc-ai-detection-item ${selectedBox === d.id ? 'is-active' : ''}`} onMouseEnter={() => setSelectedBox(d.id)} onMouseLeave={() => setSelectedBox(null)} onFocus={() => setSelectedBox(d.id)} onBlur={() => setSelectedBox(null)}><span className="gc-ai-item-number">{String(index + 1).padStart(2, '0')}</span><span className="gc-ai-item-text"><b>{d.label}</b><small>Object detection</small></span><span className="gc-ai-item-confidence">{Math.round(d.confidence * 100)}%</span></button>)}
