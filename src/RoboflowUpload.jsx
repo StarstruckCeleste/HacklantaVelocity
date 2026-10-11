@@ -78,7 +78,6 @@ export default function RoboflowUpload() {
   const [busy, setBusy] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [error, setError] = useState('');
-  const [confidenceThreshold, setConfidenceThreshold] = useState(0.25);
   const [showBoxes, setShowBoxes] = useState(true);
   const [selectedBox, setSelectedBox] = useState(null);
 
@@ -119,7 +118,7 @@ export default function RoboflowUpload() {
       const prepared = await prepareImage(file);
       if (sequence !== requestRef.current) return;
       setPhoto(prepared);
-      await analyze(prepared, sequence);
+      setBusy(false);
     } catch (err) {
       if (sequence !== requestRef.current) return;
       setError(err.message || 'Could not process the image.');
@@ -149,19 +148,7 @@ export default function RoboflowUpload() {
     if (fileInputRef.current) fileInputRef.current.value = '';
   }
 
-  async function loadSample() {
-    try {
-      const response = await fetch('/demo-assets/camera-3b.jpg');
-      if (!response.ok) throw new Error('Could not load the sample image.');
-      const blob = await response.blob();
-      await loadFile(new File([blob], 'sample-garage-camera.jpg', { type: 'image/jpeg' }));
-    } catch (err) {
-      setError(err.message || 'Could not load the sample image.');
-    }
-  }
-
   const visible = (result?.detections || [])
-    .filter(d => d.confidence >= confidenceThreshold)
     .sort((a, b) => b.confidence - a.confidence);
   const counts = visible.reduce((map, d) => {
     map.set(d.label, (map.get(d.label) || 0) + 1);
@@ -187,14 +174,13 @@ export default function RoboflowUpload() {
         <div><strong>{photo ? photo.name : 'Drop an image here or choose a file'}</strong><small>{photo ? `${photo.width} × ${photo.height} · ready for analysis` : 'Your image is resized locally before being sent for detection.'}</small></div>
         <div className="gc-ai-upload-actions">
           <button className="gc-ai-choose" type="button" onClick={() => fileInputRef.current?.click()}><Icon name="upload" size={16}/> {photo ? 'Change image' : 'Choose image'}</button>
-          <button className="gc-ai-sample" type="button" onClick={loadSample} disabled={busy}>Try sample</button>
         </div>
       </div>
       <div className="gc-ai-action-bar">
-        <div className="gc-ai-action-note"><Icon name="scan" size={16}/> {busy ? 'Sending to Roboflow and analyzing…' : photo ? 'Cloud detection runs automatically after upload.' : 'Upload a photo to start detection.'}</div>
+        <div className="gc-ai-action-note"><Icon name="scan" size={16}/> {busy ? 'Preparing your photo…' : result ? 'Detection complete. Choose another photo or run detection again.' : photo ? 'Photo ready. Click Detect Litter to process it.' : 'Upload a photo, then click Detect Litter.'}</div>
         <div className="gc-ai-action-buttons">
           {photo && <button className="gc-ai-clear" type="button" onClick={clear} disabled={busy}><Icon name="close" size={15}/> Clear</button>}
-          <button className="gc-ai-analyze" type="button" disabled={!photo || busy} onClick={rerun}>{busy ? <span className="gc-ai-spinner"/> : <Icon name="scan" size={17}/>} {busy ? 'Analyzing…' : 'Run detection'}</button>
+          <button className="gc-ai-analyze" type="button" disabled={!photo || busy} onClick={rerun}>{busy ? <span className="gc-ai-spinner"/> : <Icon name="scan" size={17}/>} {busy ? 'Detecting…' : 'Detect Litter'}</button>
         </div>
       </div>
     </section>
@@ -223,11 +209,10 @@ export default function RoboflowUpload() {
       <section className="gc-ai-insights-panel">
         <div className="gc-ai-panel-head"><div><span className="gc-ai-panel-eyebrow">02 / MODEL OUTPUT</span><h2>Detection Results</h2></div><Icon name="scan" size={23}/></div>
         <div className="gc-ai-summary"><span>OBJECTS DETECTED</span><strong>{result ? visible.length.toString().padStart(2, '0') : '—'}</strong><small>{result ? `${counts.size} ${counts.size === 1 ? 'class' : 'classes'} identified` : 'Waiting for analysis'}</small></div>
-        <div className="gc-ai-threshold"><div><label htmlFor="gc-ai-confidence">MINIMUM CONFIDENCE</label><b>{Math.round(confidenceThreshold * 100)}%</b></div><input id="gc-ai-confidence" type="range" min="0" max="0.95" step="0.05" value={confidenceThreshold} onChange={e => setConfidenceThreshold(Number(e.target.value))}/><div className="gc-ai-threshold-labels"><span>0%</span><span>95%</span></div></div>
         <div className="gc-ai-detection-list" aria-live="polite">
           {visible.map((d, index) => <button type="button" key={`${d.id}-${index}`} className={`gc-ai-detection-item ${selectedBox === d.id ? 'is-active' : ''}`} onMouseEnter={() => setSelectedBox(d.id)} onMouseLeave={() => setSelectedBox(null)} onFocus={() => setSelectedBox(d.id)} onBlur={() => setSelectedBox(null)}><span className="gc-ai-item-number">{String(index + 1).padStart(2, '0')}</span><span className="gc-ai-item-text"><b>{d.label}</b><small>Object detection</small></span><span className="gc-ai-item-confidence">{Math.round(d.confidence * 100)}%</span></button>)}
-          {result && !visible.length && <div className="gc-ai-no-results"><Icon name="check" size={30}/><b>No objects above this threshold</b><p>Try lowering the confidence filter or uploading another photo.</p></div>}
-          {!result && <div className="gc-ai-waiting"><Icon name={busy ? 'refresh' : 'image'} size={26}/><p>{busy ? 'Roboflow is processing the image…' : 'Upload a photo to see real model predictions.'}</p></div>}
+          {result && !visible.length && <div className="gc-ai-no-results"><Icon name="check" size={30}/><b>No objects detected</b><p>Try another photo. Results depend on the classes your model recognizes.</p></div>}
+          {!result && <div className="gc-ai-waiting"><Icon name={busy ? 'refresh' : 'image'} size={26}/><p>{busy ? 'Roboflow is processing the image…' : photo ? 'Click Detect Litter to see predictions.' : 'Upload a photo to see real model predictions.'}</p></div>}
         </div>
         <div className="gc-ai-insights-foot"><Icon name="cloud" size={16}/><span>Results come from your configured Roboflow workflow, not the sample dashboard data. Detected classes depend on how your model was trained.</span></div>
       </section>

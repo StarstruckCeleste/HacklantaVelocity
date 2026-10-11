@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.jsx';
 import Dashboard from './Dashboard.jsx';
+import ContactPage from './ContactPage.jsx';
 import TransitionSlide from './TransitionSlide.jsx';
 import './style.css';
 
@@ -57,7 +58,11 @@ function Router() {
 
   return (
     <>
-      {route.startsWith('#/demo') ? <Dashboard /> : <App />}
+      {route.startsWith('#/demo')
+        ? <Dashboard />
+        : route.startsWith('#/contact')
+          ? <ContactPage />
+          : <App />}
       {transition.active && (
         <TransitionSlide
           fading={transition.fading}
@@ -69,4 +74,3 @@ function Router() {
 }
 
 createRoot(document.getElementById('root')).render(<Router />);
-

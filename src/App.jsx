@@ -283,6 +283,13 @@ export default function App() {
           >
             LIVE DEMO <Arrow diagonal />
           </a>
+          <a
+            href="#/contact"
+            className="header-nav-contact"
+            onClick={() => setMenuOpen(false)}
+          >
+            CONTACT US
+          </a>
         </nav>
         <button className="mobile-menu" onClick={() => setMenuOpen(v => !v)} aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen}>
           <span /><span />

@@ -33,7 +33,7 @@ button:disabled { cursor: not-allowed; }
 
 /* Fixed editorial chrome */
 .site-header { position: fixed; z-index: 20; left: 0; right: 0; top: 0; height: 111px; display: flex; align-items: flex-start; justify-content: space-between; padding: 29px clamp(26px, 3.6vw, 68px); pointer-events: none; }
-.site-header button, .header-nav { pointer-events: auto; }
+.site-header button, .site-header .contact-home-link, .header-nav { pointer-events: auto; }
 .identity { background: none; padding: 0; border: 0; text-align: left; display: flex; align-items: center; gap: 13px; }
 .identity-mark { font-size: 35px; font-weight: 700; letter-spacing: -5px; line-height: 1; color: var(--mint); }
 .identity-slash { color: var(--purple); padding-right: 5px; }
@@ -49,6 +49,7 @@ button:disabled { cursor: not-allowed; }
 .header-nav { height: 49px; border: 1px solid rgba(117,125,111,.44); background: rgba(45,0,0,.58); backdrop-filter: blur(20px); border-radius: 999px; display: flex; align-items: center; gap: 21px; padding: 0 24px; box-shadow: inset 0 0 17px rgba(117,125,111,.12), 0 0 24px rgba(109,8,8,.18); }
 .header-nav button, .header-nav a { border: 0; background: transparent; color: inherit; text-decoration: none; font: 11px var(--mono); display: flex; align-items: center; gap: 11px; white-space: nowrap; cursor: pointer; transition: color .3s; }
 .header-nav button:hover, .header-nav a:hover { color: var(--mint); }
+.header-nav-contact { border-left: 1px solid rgba(238,234,215,.28) !important; padding-left: 19px; }
 .nav-orbit { display: flex; align-items: center; width: 43px; position: relative; justify-content: center; }
 .nav-orbit i { display: block; border: 1px solid #B3B7AA; width: 26px; height: 6px; transform: skew(-45deg) rotate(-8deg); border-radius: 100%; margin: 0 -7px; opacity: .75; }
 .mobile-menu { display: none; }
@@ -427,6 +428,84 @@ body {background:#100909}
 }
 @media (max-width: 540px) {
   .site-header .identity-logo-image { width: 142px; max-width: 42vw; max-height: 32px; }
+}
+
+/* Contact page */
+.contact-page {
+  min-height: 100svh;
+  background: radial-gradient(ellipse 43% 44% at 78% 22%, rgba(109,8,8,.27), transparent 80%),
+    radial-gradient(ellipse 38% 40% at 12% 89%, rgba(117,125,111,.16), transparent 78%),
+    #140909;
+  color: #EEEAD7;
+  overflow-x: hidden;
+}
+.contact-home-link { text-decoration: none; }
+.contact-main {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 135px 24px 70px;
+}
+.contact-panel {
+  width: min(520px, 100%);
+  padding: clamp(28px, 4vw, 48px);
+  border: 1px solid rgba(238,234,215,.22);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(45,0,0,.80), rgba(45,0,0,.54));
+  box-shadow: 0 24px 80px rgba(0,0,0,.20);
+  backdrop-filter: blur(18px);
+}
+.contact-panel h1 {
+  margin: 0 0 31px;
+  font-size: clamp(34px, 4vw, 48px);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -.045em;
+}
+.contact-form { display: grid; gap: 11px; }
+.contact-form label { font: 11px var(--mono); letter-spacing: .04em; color: #EEEAD7; margin-top: 9px; }
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid rgba(238,234,215,.29);
+  border-radius: 9px;
+  outline: none;
+  background: rgba(13,9,9,.43);
+  color: #EEEAD7;
+  padding: 14px 15px;
+  font: 15px 'Space Grotesk', Arial, sans-serif;
+  resize: vertical;
+  transition: border-color .2s, box-shadow .2s;
+}
+.contact-form textarea { min-height: 140px; }
+.contact-form input:focus,
+.contact-form textarea:focus { border-color: #EEEAD7; box-shadow: 0 0 0 3px rgba(238,234,215,.10); }
+.contact-send {
+  margin-top: 14px;
+  border: 1px solid #EEEAD7;
+  border-radius: 9px;
+  padding: 14px 20px;
+  background: #EEEAD7;
+  color: #2D0000;
+  font: 700 12px var(--mono);
+  letter-spacing: .13em;
+  cursor: pointer;
+  transition: background .2s, transform .2s;
+}
+.contact-send:hover:not(:disabled) { background: #FFFFFF; transform: translateY(-1px); }
+.contact-send:disabled { cursor: wait; opacity: .6; }
+.contact-send:focus-visible { outline: 3px solid #A9B09F; outline-offset: 3px; }
+.contact-status { margin: 3px 0 0; font-size: 13px; line-height: 1.5; }
+.contact-status.is-error { color: #F0C3BC; }
+.contact-status.is-success { color: #D8E9CB; }
+@media (max-width: 800px) {
+  .header-nav-contact { padding-left: 12px; }
+}
+@media (max-width: 540px) {
+  .header-nav-contact { padding-left: 0; border-left: 0 !important; }
+  .contact-main { padding: 110px 20px 40px; }
+  .contact-panel { padding: 28px 22px; }
 }
 
 /* Interstitial transition slide between Ad and Demo websites */

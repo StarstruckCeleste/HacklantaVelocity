@@ -26,7 +26,7 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:5173/#/demo`, then click **AI Detection** in the sidebar. Upload a JPG, PNG, or WebP image (or click **Try sample**). The image is resized locally and automatically submitted to the **real Roboflow cloud workflow**. The result appears with bounding boxes, class labels, confidence scores, and a confidence slider.
+Open `http://localhost:5173/#/demo`, then click **AI Detection** in the sidebar. Upload a JPG, PNG, or WebP image, then click **Detect Litter**. The image is resized locally and sent to the **real Roboflow cloud workflow**. The result appears with bounding boxes, class labels, and confidence scores.
 
 **No `localhost:9001` inference server, Python process, or separate API process is needed.** The included Vite development middleware handles `/api/detect` locally.
 
@@ -53,6 +53,7 @@ If you see a 503 configuration error, check your API key. If you see a workflow-
 ## Other site features
 
 - 3D scroll-driven garage landing page and black oil spill on the top floor.
+- Contact Us page at `/#/contact`. To enable message delivery, configure a Formspree endpoint as `VITE_CONTACT_FORM_ENDPOINT` when building the site. Without it, the form reports that sending is not configured.
 - Compact GarageGuard logo in both headers; no center crosshair or live-view title overlay.
 - Clickable `...` story text, expanded without a shadow fade.
 - Dashboard with repeated incidents, sample camera stills, floor map, tasks and analytics.
