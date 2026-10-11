@@ -112,7 +112,9 @@ const chapters = [
       { type: 'bullet-title', text: 'MOVE MORE EFFICIENTLY' },
       { type: 'bullet-body', text: 'Organize nearby tasks and plan more practical routes across the facility.' },
       { type: 'bullet-title', text: 'KNOW WHAT\'S BEEN DONE' },
-      { type: 'bullet-body', text: '...' },
+      { type: 'bullet-body', text: 'Update task statuses in real time to avoid duplicate sweeps and keep the entire team in sync.' },
+      { type: 'paragraph', text: 'By eliminating the guesswork from daily maintenance, GarageGuard gives cleaning crews greater clarity, safety, and control over their shifts.' },
+      { type: 'paragraph', text: 'The result is a less demanding workflow, fewer unnecessary trips across massive decks, and an experience built to support the people doing the work.' },
     ],
   },
   {
