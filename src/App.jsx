@@ -21,7 +21,7 @@ const chapters = [
     eyebrow: '02. ABOUT US',
     title: <>ABOUT <em>US.</em></>,
     fullHeading: 'A Cleaner Garage Starts With a Safer Worker.',
-    summary: 'Cleaning crews keep garages safe, but often work with limited information and overlooked hazards...',
+    summary: 'Cleaning crews keep garages safe, but often work with limited information and overlooked hazards.',
     label: 'MISSION / SAFER CLEANING',
     metric: 'AI',
     metricLabel: 'ASSISTED OPERATIONS',
@@ -41,7 +41,7 @@ const chapters = [
     eyebrow: '03. THE REALITY OF CLEANING',
     title: <>HIDDEN <em>HAZARDS.</em></>,
     fullHeading: "The Problems You Don’t See Are the Ones That Matter.",
-    summary: 'Spills, debris, wasted time, and missed reports can make everyday cleaning harder...',
+    summary: 'Spills, debris, wasted time, and missed reports can make everyday cleaning harder.',
     label: 'PAIN POINTS / CURRENT STATE',
     metric: '04',
     metricLabel: 'CORE CHALLENGES',
@@ -68,7 +68,7 @@ const chapters = [
     eyebrow: '04. MEET GARAGEGUARD',
     title: <>MEET <em>GARAGEGUARD.</em></>,
     fullHeading: 'From Overlooked Problems to Actionable Solutions.',
-    summary: 'AI-assisted detection turns overlooked maintenance problems into clear next steps...',
+    summary: 'AI-assisted detection turns overlooked maintenance problems into clear next steps.',
     label: 'DETECT / PRIORITIZE / RESPOND / RESOLVE',
     metric: '4X',
     metricLabel: 'WORKFLOW STEPS',
@@ -96,7 +96,7 @@ const chapters = [
     eyebrow: '05. THE WORKER EXPERIENCE',
     title: <>SMARTER <em>CLEANING.</em></>,
     fullHeading: 'Less Searching. Less Guesswork. Smarter Cleaning.',
-    summary: 'Spend less time searching and more time addressing what matters...',
+    summary: 'Spend less time searching and more time addressing what matters.',
     label: 'WORKFLOW / ON-THE-GROUND IMPACT',
     metric: 'UX',
     metricLabel: 'WORKER-FIRST DESIGN',
@@ -121,7 +121,7 @@ const chapters = [
     eyebrow: '06. LIVE DEMO',
     title: <>LIVE <em>DEMO.</em></>,
     summary: 'Explore live-style detections, repeated incidents, floor maps, and cleaning tasks.',
-    label: 'GARAGEGUARD AI / INTERACTIVE DEMO',
+    label: 'GARAGEGUARD / INTERACTIVE DEMO',
     metric: 'LIVE',
     metricLabel: 'PRODUCT WALKTHROUGH',
     align: 'right',
@@ -145,8 +145,10 @@ function RichCopy({ chapter, expanded, onToggle }) {
   return (
     <div className={`story-copy ${expanded ? 'is-expanded' : 'is-collapsed'}`}>
       {!expanded ? (
-        <p className="story-description story-preview">
-          {chapter.summary.replace(/\.\.\.$/, '').trimEnd()}{' '}
+        <>
+          <p className="story-description story-preview">
+            {chapter.summary.replace(/\.\.\.$/, '.').trimEnd()}
+          </p>
           <button
             type="button"
             className="story-ellipsis"
@@ -154,8 +156,8 @@ function RichCopy({ chapter, expanded, onToggle }) {
             aria-label="Expand chapter text"
             aria-expanded={false}
             title="Read the full chapter"
-          >...</button>
-        </p>
+          >[read more]</button>
+        </>
       ) : (
         <>
           <div className="story-copy-inner" id={`chapter-copy-${chapter.number}`}>
@@ -176,7 +178,7 @@ function RichCopy({ chapter, expanded, onToggle }) {
             aria-expanded={true}
             aria-controls={`chapter-copy-${chapter.number}`}
             title="Collapse chapter"
-          >...</button>
+          >[read less]</button>
         </>
       )}
     </div>
@@ -259,11 +261,28 @@ export default function App() {
         <button className="identity identity-image" onClick={() => goTo(0)} aria-label="Return to opening">
           <img className="identity-logo-image" src="/garageguard-header-logo.png" alt="GarageGuard logo" />
         </button>
-        <div className="header-center"><span className="live-dot" /> WORKER-FIRST FACILITY AI <span className="header-separator">/</span> DEMO BUILD</div>
+        <div className="header-center">
+          WORKER-FIRST FACILITY AI <span className="header-separator">/</span>{' '}
+          <button
+            type="button"
+            className="header-demo-button"
+            onClick={() => goTo(5)}
+            title="Jump to slide 6"
+            aria-label="Jump to slide 6"
+          >
+            DEMO BUILD
+          </button>
+        </div>
         <nav className={`header-nav ${menuOpen ? 'menu-open' : ''}`} aria-label="Main navigation">
           <button onClick={() => goTo(1)}>ABOUT</button>
           <span className="nav-orbit" aria-hidden="true"><i /><i /></span>
-          <button onClick={() => goTo(chapters.length - 1)}>LIVE DEMO <Arrow diagonal /></button>
+          <a
+            href="#/demo"
+            onClick={() => setMenuOpen(false)}
+            aria-label="Launch Live Demo website"
+          >
+            LIVE DEMO <Arrow diagonal />
+          </a>
         </nav>
         <button className="mobile-menu" onClick={() => setMenuOpen(v => !v)} aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen}>
           <span /><span />
@@ -307,7 +326,7 @@ export default function App() {
                 <div className="story-rule" />
                 <div className="chapter-meta">
                   <div><strong>{chapter.metric}</strong><small>{chapter.metricLabel}</small></div>
-                  <span className="chapter-meta-tag"><span className="pulse-indicator" /> {chapter.label}</span>
+                  <span className="chapter-meta-tag">{/*<span className="pulse-indicator" />*/}{chapter.label}</span>
                 </div>
                 {chapter.kind === 'incident' && (
                   <button className="outline-action" onClick={() => setIncidentOpen(true)}>
