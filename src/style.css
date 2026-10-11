@@ -93,7 +93,8 @@ button:disabled { cursor: not-allowed; }
 .hero .story-title { font-size: clamp(37px, 3.7vw, 58px); margin-top: 28px; }
 .hero .story-description { font-size: 14px; }
 .ending .story-title { font-size: clamp(32px, 3vw, 48px); }
-.floating-telemetry { position: absolute; right: clamp(50px, 12vw, 210px); top: 67%; width: 234px; background: rgba(45,0,0,.72); padding: 13px 16px; border: 1px solid rgba(117,125,111,.5); border-radius: 9px; backdrop-filter: blur(18px); color: #B3B7AA; opacity: 0; transform: translateY(35px); transition: opacity .55s ease .25s, transform .7s ease .25s; font: 10px/1.9 var(--mono); letter-spacing: .06em; }
+.floating-telemetry { position: absolute; right: clamp(50px, 12vw, 210px); top: 67%; width: 234px; background: rgba(45,0,0,.72); padding: 13px 16px; border: 1px solid rgba(117,125,111,.5); border-radius: 9px; backdrop-filter: blur(18px); color: #B3B7AA; opacity: 0; transform: translateY(35px); transition: opacity .55s ease .25s, transform .7s ease .25s, border-color .2s ease, background .2s ease; font: 10px/1.9 var(--mono); letter-spacing: .06em; text-align: left; cursor: pointer; pointer-events: auto; }
+.floating-telemetry:hover { border-color: #EEEAD7; background: rgba(65,0,0,.92); }
 .chapter.is-active .floating-telemetry { opacity: 1; transform: translateY(0); }
 .telemetry-title { color: #757D6F; margin-bottom: 6px; }
 .pink-dot { background: #757D6F; box-shadow: 0 0 12px #757D6F; vertical-align: 1px; margin-right: 5px; }

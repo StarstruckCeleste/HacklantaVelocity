@@ -209,6 +209,14 @@ function makeGarage(scene) {
   hazardRing.position.set(3.6, hazardY + 0.04, 0.15);
   group.add(hazardRing);
 
+  // Invisible generous click target for user-friendly interaction
+  const hitTarget = new THREE.Mesh(
+    new THREE.CylinderGeometry(1.65, 1.65, 0.9, 18),
+    new THREE.MeshBasicMaterial({ visible: false }),
+  );
+  hitTarget.position.set(3.6, hazardY + 0.45, 0.15);
+  group.add(hitTarget);
+
   // Small security cameras on several corners with subtle scan-volume cones.
   const sensorHeads = [];
   [[-3.2, floors[2] - 0.18, 4.55], [3.0, floors[3] - 0.18, -4.2],
@@ -244,7 +252,7 @@ function makeGarage(scene) {
   ring.position.y = -1.74;
   group.add(ring);
 
-  return { group, hazardRing, spill, sensorHeads };
+  return { group, hazardRing, spill, hitTarget, sensorHeads };
 }
 
 function addAtmosphere(scene) {
@@ -287,7 +295,7 @@ function addAtmosphere(scene) {
 }
 
 /** Real Three.js geometry with a frame-rate-independent camera orbit. */
-export default function GarageScene({ scrollProgressRef, reducedMotionRef }) {
+export default function GarageScene({ scrollProgressRef, reducedMotionRef, onSpillClick }) {
   const mountRef = useRef(null);
 
   useEffect(() => {
@@ -328,7 +336,7 @@ export default function GarageScene({ scrollProgressRef, reducedMotionRef }) {
     ivory.position.set(6, 3, 8);
     scene.add(ivory);
 
-    const { group, hazardRing, spill, sensorHeads } = makeGarage(scene);
+    const { group, hazardRing, spill, hitTarget, sensorHeads } = makeGarage(scene);
     const particles = addAtmosphere(scene);
     const clock = new THREE.Clock();
     let smoothedProgress = Math.max(0, Math.min(1, scrollProgressRef.current));
@@ -336,10 +344,60 @@ export default function GarageScene({ scrollProgressRef, reducedMotionRef }) {
     let mouseX = 0;
     let mouseY = 0;
     let isVisible = true;
+
+    const raycaster = new THREE.Raycaster();
+    const rayMouse = new THREE.Vector2();
+    let isHovered = false;
+    let downX = 0;
+    let downY = 0;
+
+    const checkSpillHit = (clientX, clientY) => {
+      rayMouse.x = (clientX / window.innerWidth) * 2 - 1;
+      rayMouse.y = -(clientY / window.innerHeight) * 2 + 1;
+      raycaster.setFromCamera(rayMouse, camera);
+      const hits = raycaster.intersectObjects([hitTarget, spill, hazardRing], true);
+      return hits.length > 0;
+    };
+
     const onPointer = (event) => {
       mouseX = (event.clientX / Math.max(1, window.innerWidth) - 0.5) * 2;
       mouseY = (event.clientY / Math.max(1, window.innerHeight) - 0.5) * 2;
+
+      if (event.target.closest?.('.incident-modal, .site-header, .chapter-nav, .chapter-content')) {
+        if (isHovered) {
+          isHovered = false;
+          document.body.style.cursor = '';
+        }
+        return;
+      }
+
+      const hit = checkSpillHit(event.clientX, event.clientY);
+      if (hit !== isHovered) {
+        isHovered = hit;
+        document.body.style.cursor = hit ? 'pointer' : '';
+      }
     };
+
+    const onPointerDown = (event) => {
+      downX = event.clientX;
+      downY = event.clientY;
+    };
+
+    const onClick = (event) => {
+      if (event.target.closest?.('button, a, input, textarea, .incident-modal, .site-header, .chapter-nav, .chapter-content')) {
+        return;
+      }
+      const dx = event.clientX - downX;
+      const dy = event.clientY - downY;
+      if (Math.hypot(dx, dy) > 8) {
+        return;
+      }
+
+      if (checkSpillHit(event.clientX, event.clientY)) {
+        onSpillClick?.();
+      }
+    };
+
     const observer = new ResizeObserver(() => {
       const w = mount.clientWidth;
       const h = mount.clientHeight;
@@ -354,6 +412,8 @@ export default function GarageScene({ scrollProgressRef, reducedMotionRef }) {
     const visibility = () => { isVisible = !document.hidden; };
     document.addEventListener('visibilitychange', visibility);
     window.addEventListener('pointermove', onPointer, { passive: true });
+    window.addEventListener('pointerdown', onPointerDown, { passive: true });
+    window.addEventListener('click', onClick);
 
     const frame = () => {
       raf = requestAnimationFrame(frame);
@@ -374,9 +434,17 @@ export default function GarageScene({ scrollProgressRef, reducedMotionRef }) {
       const target = new THREE.Vector3(0, mobile ? 3.1 : 2.75, 0);
       camera.lookAt(target);
       if (!reducedMotionRef.current) {
-        hazardRing.scale.setScalar(1 + Math.sin(clock.elapsedTime * 2.3) * 0.095);
-        hazardRing.material.opacity = 0.58 + Math.sin(clock.elapsedTime * 2.3) * 0.24;
-        spill.material.opacity = 0.7 + Math.sin(clock.elapsedTime * 1.4) * 0.11;
+        if (isHovered) {
+          hazardRing.scale.setScalar(1.22 + Math.sin(clock.elapsedTime * 6) * 0.08);
+          hazardRing.material.opacity = 1.0;
+          hazardRing.material.color.setHex(0xEEEAD7);
+          spill.material.opacity = 0.98;
+        } else {
+          hazardRing.scale.setScalar(1 + Math.sin(clock.elapsedTime * 2.3) * 0.095);
+          hazardRing.material.opacity = 0.58 + Math.sin(clock.elapsedTime * 2.3) * 0.24;
+          hazardRing.material.color.setHex(0x757D6F);
+          spill.material.opacity = 0.7 + Math.sin(clock.elapsedTime * 1.4) * 0.11;
+        }
         particles.rotation.y += dt * 0.0015;
         sensorHeads.forEach((sensor, i) => {
           sensor.material.opacity = 0.68 + 0.32 * Math.sin(clock.elapsedTime * 1.7 + i);
@@ -388,6 +456,9 @@ export default function GarageScene({ scrollProgressRef, reducedMotionRef }) {
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener('pointermove', onPointer);
+      window.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('click', onClick);
+      document.body.style.cursor = '';
       document.removeEventListener('visibilitychange', visibility);
       observer.disconnect();
       scene.traverse((object) => {
@@ -401,7 +472,7 @@ export default function GarageScene({ scrollProgressRef, reducedMotionRef }) {
       renderer.dispose();
       renderer.domElement.remove();
     };
-  }, [scrollProgressRef, reducedMotionRef]);
+  }, [scrollProgressRef, reducedMotionRef, onSpillClick]);
 
   return <div className="three-stage" aria-hidden="true" ref={mountRef} />;
 }

@@ -265,9 +265,17 @@ export default function App() {
     return () => window.removeEventListener('hashchange', handleHash);
   }, [goTo]);
 
+  const handleSpillClick = useCallback(() => {
+    setIncidentOpen(true);
+  }, []);
+
   return (
     <div className="app-shell">
-      <GarageScene scrollProgressRef={scrollProgressRef} reducedMotionRef={reducedMotionRef} />
+      <GarageScene
+        scrollProgressRef={scrollProgressRef}
+        reducedMotionRef={reducedMotionRef}
+        onSpillClick={handleSpillClick}
+      />
       <div className="ambient-light ambient-light-a" aria-hidden="true" />
       <div className="ambient-light ambient-light-b" aria-hidden="true" />
       <div className="screen-grain" aria-hidden="true" />
@@ -366,12 +374,18 @@ export default function App() {
                 )}
               </div>
               {chapter.kind === 'incident' && (
-                <div className="floating-telemetry" aria-hidden="true">
+                <button
+                  type="button"
+                  className="floating-telemetry"
+                  onClick={() => setIncidentOpen(true)}
+                  title="View Incident Report"
+                  aria-label="View Incident Report"
+                >
                   <div className="telemetry-title"><span className="pink-dot" /> OBJECT IDENTIFIED</div>
                   <div>CAM_04 / OIL SPILL</div>
                   <div>FLOOR_04 · ZONE_B2</div>
                   <div className="telemetry-bars"><span /><span /><span /><span /><span /><span /><span /><span /></div>
-                </div>
+                </button>
               )}
             </section>
           );
