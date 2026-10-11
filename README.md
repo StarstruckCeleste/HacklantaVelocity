@@ -8,8 +8,8 @@
 
 > *Say GG to parking deck hazards with GarageGuard!*
 
-🌐 **Live Demo:** [www.ggeznodiff.us](https://www.ggeznodiff.us)
-🎮 **Interactive Dashboard:** [www.ggeznodiff.us/#/dashboard](https://www.ggeznodiff.us/#/dashboard)
+**Live Demo:** [www.ggeznodiff.us](https://www.ggeznodiff.us)
+**Interactive Dashboard:** [www.ggeznodiff.us/#/dashboard](https://www.ggeznodiff.us/#/dashboard)
 
 ---
 
