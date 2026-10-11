@@ -249,6 +249,12 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKey);
   }, [goTo, incidentOpen]);
 
+  useEffect(() => {
+    if (window.location.hash === '#/about') {
+      goTo(1);
+    }
+  }, [goTo]);
+
   return (
     <div className="app-shell">
       <GarageScene scrollProgressRef={scrollProgressRef} reducedMotionRef={reducedMotionRef} />
@@ -258,9 +264,9 @@ export default function App() {
       <div className="vignette" aria-hidden="true" />
 
       <header className="site-header">
-        <button className="identity identity-image" onClick={() => goTo(0)} aria-label="Return to opening">
+        <a className="identity identity-image" href="#/" onClick={(e) => { e.preventDefault(); goTo(0); }} aria-label="Return to opening">
           <img className="identity-logo-image" src="/garageguard-header-logo.png" alt="GarageGuard logo" />
-        </button>
+        </a>
         <div className="header-center">
           WORKER-FIRST FACILITY AI <span className="header-separator">/</span>{' '}
           <button
@@ -274,21 +280,21 @@ export default function App() {
           </button>
         </div>
         <nav className={`header-nav ${menuOpen ? 'menu-open' : ''}`} aria-label="Main navigation">
-          <button onClick={() => goTo(1)}>ABOUT</button>
-          <span className="nav-orbit" aria-hidden="true"><i /><i /></span>
+          <a href="#/about" onClick={(e) => { e.preventDefault(); goTo(1); }}>ABOUT</a>
+          <span className="nav-divider" aria-hidden="true" />
+          <a
+            href="#/contact"
+            onClick={() => setMenuOpen(false)}
+          >
+            CONTACT US
+          </a>
+          <span className="nav-divider" aria-hidden="true" />
           <a
             href="#/demo"
             onClick={() => setMenuOpen(false)}
             aria-label="Launch Live Demo website"
           >
             LIVE DEMO <Arrow diagonal />
-          </a>
-          <a
-            href="#/contact"
-            className="header-nav-contact"
-            onClick={() => setMenuOpen(false)}
-          >
-            CONTACT US
           </a>
         </nav>
         <button className="mobile-menu" onClick={() => setMenuOpen(v => !v)} aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen}>

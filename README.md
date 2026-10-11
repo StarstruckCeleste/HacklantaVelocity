@@ -1,4 +1,4 @@
-# GarageGuard AI — 3D Website, Dashboard & Roboflow Cloud Detector
+# GarageGuard
 
 A React + Vite parking garage experience with an interactive dashboard and **real image-upload object detection** powered by the Roboflow Cloud Workflow.
 
