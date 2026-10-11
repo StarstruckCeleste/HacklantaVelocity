@@ -61,13 +61,12 @@ GarageGuard is accessible directly via web browser at [www.ggeznodiff.us](https:
 
 The dashboard is purpose-built for facility directors, janitorial supervisors, and cleaning crews:
 
-- **Daily Incident Triage (Dashboard Tab):**View total detections, open tasks, high-priority warnings, and repeat hotspot summaries at a glance. Select any detection to inspect its location, camera tag, and confidence score.
-- **2D Floor Blueprint Navigation (Floor Map Tab):**Select floors (Levels 1–4) to view top-down spatial layouts. Click color-coded markers (High, Medium, Low, Resolved) to view item details and pinpoint exact locations instead of sweeping blind.
-- **CCTV Feed Monitoring (Live Cameras Tab):**Browse camera stills across floors and zones (A–F). Review AI-detected hazard bounding boxes and click **Create / View Task** to initiate cleaning jobs directly from footage.
-- **Task Dispatch & Management (Tasks Tab):**Manage active cleaning jobs across the deck. Filter by status (`Pending`, `Assigned`, `In Progress`, `Completed`) and update task states with the responsive dropdown menu as crews finish their sweeps.
-- **Recurrence & Spill Tracking (Repeated Incidents Tab):**Identify persistent problem areas where waste or fluid regularly accumulates in the same floor and zone. View sighting history timelines, inspect repeat counts, or click **Simulate Repeat** to test operational alerts.
-- **Analytics & Reporting (Analytics Tab):**
-  Review detection volume breakdown by floor and hazard risk distribution. Click **Export CSV** to download complete telemetry and incident logs for facility audits.
+- **Daily Incident Triage (Dashboard Tab):** View total detections, open tasks, high-priority warnings, and repeat hotspot summaries at a glance. Select any detection to inspect its location, camera tag, and confidence score.
+- **2D Floor Blueprint Navigation (Floor Map Tab):** Select floors (Levels 1–4) to view top-down spatial layouts. Click color-coded markers (High, Medium, Low, Resolved) to view item details and pinpoint exact locations instead of sweeping blind.
+- **CCTV Feed Monitoring (Live Cameras Tab):** Browse camera stills across floors and zones (A–F). Review AI-detected hazard bounding boxes and click **Create / View Task** to initiate cleaning jobs directly from footage.
+- **Task Dispatch & Management (Tasks Tab):** Manage active cleaning jobs across the deck. Filter by status (`Pending`, `Assigned`, `In Progress`, `Completed`) and update task states with the responsive dropdown menu as crews finish their sweeps.
+- **Recurrence & Spill Tracking (Repeated Incidents Tab):** Identify persistent problem areas where waste or fluid regularly accumulates in the same floor and zone. View sighting history timelines, inspect repeat counts, or click **Simulate Repeat** to test operational alerts.
+- **Analytics & Reporting (Analytics Tab):** Review detection volume breakdown by floor and hazard risk distribution. Click **Export CSV** to download complete telemetry and incident logs for facility audits.
 
 ### 3. Running Real AI Cleanup Detection
 
