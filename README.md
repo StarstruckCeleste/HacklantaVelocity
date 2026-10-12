@@ -15,7 +15,7 @@
 
 ## Highlights
 
-- **Automated Hazard & Spill Detection:** Identifies oil slicks, liquid puddles, broken glass, and litter from camera feeds using computer vision.
+- **Automated Hazard & Spill Detection:** Identifies oil slicks, liquid puddles, broken glass, overflowing trash, vehicle fluid leaks, and litter from camera feeds using computer vision.
 - **Leverages Existing Infrastructure:** Integrates directly with existing parking deck security and operational cameras, so no costly hardware overhauls required.
 - **Worker-First Operations Dashboard:** Replaces exhausting blind sweeps with an intuitive 2D blueprint map, real-time task queue, and camera monitors designed specifically for cleaning crews and facility managers.
 - **Real Roboflow Cloud Workflow:** Full image-upload detection powered by serverless Roboflow Workflows, client-side image compression, and server-side API key protection.
